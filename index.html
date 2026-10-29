@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Agent Handshake — Ziki Human-Agent Interaction</title>
+  <meta name="description" content="A deliberate approval moment between human and agent. Hold out your hand to award a claim or merge a fix in Ziki.">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🤝</text></svg>">
+</head>
+<body>
+  <!-- Ambient background glow effects -->
+  <div class="ambient-glow glow-top-left"></div>
+  <div class="ambient-glow glow-bottom-right"></div>
+  <div class="cyber-grid"></div>
+
+  <div class="app-container">
+    <!-- Top Navigation Bar -->
+    <header class="app-header">
+      <div class="brand">
+        <div class="logo-mark">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="#3b82f6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M2 17L12 22L22 17" stroke="#3b82f6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M2 12L12 17L22 12" stroke="#60a5fa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div class="brand-text">
+          <span class="brand-name">ZIKI</span>
+          <span class="brand-divider">/</span>
+          <span class="brand-sub">AGENT HANDSHAKE</span>
+        </div>
+        <span class="badge badge-pulse">v2.4 Live Protocol</span>
+      </div>
+
+      <div class="header-actions">
+        <button id="soundToggleBtn" class="btn-icon" title="Toggle Sound FX (Shortcut: M)" aria-label="Toggle Sound">
+          <svg id="soundIconOn" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+            <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+          </svg>
+          <svg id="soundIconOff" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none;">
+            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+            <line x1="23" y1="9" x2="17" y2="15"></line>
+            <line x1="17" y1="9" x2="23" y2="15"></line>
+          </svg>
+        </button>
+
+        <button id="resetDemoBtn" class="btn-subtle" title="Reset all issues to initial state">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"></path>
+            <path d="M21 3v5h-5"></path>
+            <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"></path>
+            <path d="M8 16H3v5"></path>
+          </svg>
+          <span>Reset Demo</span>
+        </button>
+
+        <div class="user-pill">
+          <span class="user-avatar">JH</span>
+          <span class="user-role">Human-in-the-Loop</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- Hero Intro Section -->
+    <section class="hero-intro">
+      <div class="hero-content">
+        <div class="hero-tag">
+          <span class="sparkle-icon">✦</span>
+          <span>HUMAN-AGENT PROTOCOL</span>
+        </div>
+        <h1 class="hero-title">Agent handshake</h1>
+        <p class="hero-subtitle">
+          An approval in Ziki is a deliberate moment between you and an agent. Hold out your hand to award a claim or merge a fix, and watch the bot do its part in between.
+        </p>
+      </div>
+
+      <div class="hero-stats">
+        <div class="stat-item">
+          <div class="stat-value" id="activeAgentsCount">3</div>
+          <div class="stat-label">Active Agents</div>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat-item">
+          <div class="stat-value text-amber" id="pendingGatesCount">2</div>
+          <div class="stat-label">Human Gates Awaiting</div>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat-item">
+          <div class="stat-value text-emerald" id="completedHandshakesCount">14</div>
+          <div class="stat-label">Sealed Handshakes</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Main Workspace Layout: 3 Columns / Sections -->
+    <div class="workspace-grid">
+      <!-- Left Column: Issues Queue -->
+      <aside class="issues-panel card">
+        <div class="panel-header">
+          <div class="panel-title-group">
+            <h2 class="panel-title">Active Issues Queue</h2>
+            <span class="count-tag" id="issueCountTag">4</span>
+          </div>
+          <span class="panel-hint">Select to inspect</span>
+        </div>
+
+        <div class="issues-list" id="issuesList" role="listbox" aria-label="Issues Queue">
+          <!-- Dynamically populated issues -->
+        </div>
+
+        <div class="panel-footer-note">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="16" x2="12" y2="12"></line>
+            <line x1="12" y1="8" x2="12.01" y2="8"></line>
+          </svg>
+          <span>Use <b>[1 - 4]</b> keys to toggle issues rapidly</span>
+        </div>
+      </aside>
+
+      <!-- Center & Right Column: Interactive Stage & Protocol View -->
+      <main class="interaction-panel">
+        
+        <!-- Active Issue Overview Header -->
+        <div class="card active-issue-card">
+          <div class="issue-banner">
+            <div class="issue-id-row">
+              <span class="issue-number" id="currentIssueNumber">#412</span>
+              <span class="badge" id="currentIssueStatusBadge">Waiting on you</span>
+              <span class="stage-pill" id="currentStageBadge">Stage 3: Authorize</span>
+            </div>
+            <h2 class="active-issue-title" id="currentIssueTitle">Leaderboard rows overflow on small screens</h2>
+            <p class="active-issue-desc" id="currentIssueDescription">
+              Flex container width causes table rows to wrap unexpectedly on viewport widths below 380px, cutting off Elo rating points.
+            </p>
+          </div>
+
+          <!-- 6-Stage Progress Track -->
+          <div class="progress-track-wrapper">
+            <div class="track-header">
+              <span class="track-label">Ziki 6-Stage Lifecycle</span>
+              <span class="track-status" id="trackStatusSummary">Awaiting Human Gate authorization</span>
+            </div>
+            
+            <div class="track-stepper" id="trackStepper">
+              <!-- Stage 1 -->
+              <div class="step-node" data-stage="1">
+                <div class="step-indicator">
+                  <span class="step-num">1</span>
+                  <div class="step-check">✓</div>
+                </div>
+                <div class="step-info">
+                  <span class="step-name">Report</span>
+                  <code class="step-event">issue.created</code>
+                </div>
+              </div>
+
+              <div class="step-connector" data-connector="1"></div>
+
+              <!-- Stage 2 -->
+              <div class="step-node" data-stage="2">
+                <div class="step-indicator">
+                  <span class="step-num">2</span>
+                  <div class="step-check">✓</div>
+                </div>
+                <div class="step-info">
+                  <span class="step-name">Confirm</span>
+                  <code class="step-event">issue.confirmed</code>
+                </div>
+              </div>
+
+              <div class="step-connector" data-connector="2"></div>
+
+              <!-- Stage 3: Human Gate 1 -->
+              <div class="step-node human-gate" data-stage="3">
+                <div class="gate-tag">GATE 1</div>
+                <div class="step-indicator">
+                  <span class="gate-icon">🤝</span>
+                  <div class="step-check">✓</div>
+                </div>
+                <div class="step-info">
+                  <span class="step-name">Authorize</span>
+                  <code class="step-event">claim.accepted</code>
+                </div>
+              </div>
+
+              <div class="step-connector" data-connector="3"></div>
+
+              <!-- Stage 4 -->
+              <div class="step-node" data-stage="4">
+                <div class="step-indicator">
+                  <span class="step-num">4</span>
+                  <div class="step-check">✓</div>
+                </div>
+                <div class="step-info">
+                  <span class="step-name">Deliver</span>
+                  <code class="step-event">issue.pr_linked</code>
+                </div>
+              </div>
+
+              <div class="step-connector" data-connector="4"></div>
+
+              <!-- Stage 5 -->
+              <div class="step-node" data-stage="5">
+                <div class="step-indicator">
+                  <span class="step-num">5</span>
+                  <div class="step-check">✓</div>
+                </div>
+                <div class="step-info">
+                  <span class="step-name">Prove</span>
+                  <code class="step-event">issue.test_verdict</code>
+                </div>
+              </div>
+
+              <div class="step-connector" data-connector="5"></div>
+
+              <!-- Stage 6: Human Gate 2 -->
+              <div class="step-node human-gate" data-stage="6">
+                <div class="gate-tag">GATE 2</div>
+                <div class="step-indicator">
+                  <span class="gate-icon">🤝</span>
+                  <div class="step-check">✓</div>
+                </div>
+                <div class="step-info">
+                  <span class="step-name">Merge</span>
+                  <code class="step-event">issue.accepted</code>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- The Interactive Handshake Stage (Hero Arena) -->
+        <div class="card handshake-stage-card">
+          <div class="stage-card-header">
+            <div class="stage-context">
+              <span class="stage-tag-live">INTERACTIVE HUMAN GATE</span>
+              <span class="agent-handle" id="currentAgentHandle">@byte-bot-42</span>
+            </div>
+            <div class="interaction-guide">
+              <span>Press & Hold <kbd>Space</kbd> or the button</span>
+            </div>
+          </div>
+
+          <!-- The Visual Arena (Bot + Speech + Handshake) -->
+          <div class="handshake-arena" id="handshakeArena">
+            <!-- Spark particle burst canvas -->
+            <canvas id="sparkCanvas" class="spark-canvas"></canvas>
+
+            <!-- Agent Speech Bubble -->
+            <div class="speech-bubble" id="speechBubble">
+              <div class="speech-header">
+                <span class="bot-name" id="bubbleBotName">ByteBot</span>
+                <span class="typing-indicator" id="typingIndicator">
+                  <span></span><span></span><span></span>
+                </span>
+              </div>
+              <p class="speech-text" id="bubbleText">
+                "Hey human! I reproduced the overflow bug on viewport &lt; 380px and have a CSS Grid patch ready. Hold out your hand to award me this claim!"
+              </p>
+              <div class="speech-arrow"></div>
+            </div>
+
+            <!-- Handshake Stage Actors (Bot on Left, You on Right) -->
+            <div class="actors-stage">
+              <!-- Left Actor: The Autonomous Bot -->
+              <div class="actor actor-bot" id="actorBot">
+                <!-- SVG Bot Character -->
+                <svg class="bot-svg" id="botSvg" viewBox="0 0 260 260" width="220" height="220" xmlns="http://www.w3.org/2000/svg">
+                  <defs>
+                    <linearGradient id="botGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                      <stop offset="0%" stop-color="#3b82f6"/>
+                      <stop offset="100%" stop-color="#1d4ed8"/>
+                    </linearGradient>
+                    <linearGradient id="metalGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                      <stop offset="0%" stop-color="#475569"/>
+                      <stop offset="100%" stop-color="#1e293b"/>
+                    </linearGradient>
+                    <linearGradient id="screenGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                      <stop offset="0%" stop-color="#0f172a"/>
+                      <stop offset="100%" stop-color="#020617"/>
+                    </linearGradient>
+                    <filter id="neonGlow" x="-20%" y="-20%" width="140%" height="140%">
+                      <feGaussianBlur stdDeviation="4" result="blur" />
+                      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+                    </filter>
+                  </defs>
+
+                  <!-- Bot Shadow -->
+                  <ellipse cx="110" cy="245" rx="55" ry="8" fill="rgba(0,0,0,0.3)" class="bot-shadow"/>
+
+                  <!-- Antenna with pulsating light -->
+                  <rect x="107" y="24" width="6" height="24" rx="3" fill="#64748b"/>
+                  <circle cx="110" cy="20" r="9" fill="#38bdf8" filter="url(#neonGlow)" class="antenna-bulb"/>
+
+                  <!-- Bot Head -->
+                  <rect x="60" y="44" width="100" height="74" rx="20" fill="url(#botGrad)" stroke="#60a5fa" stroke-width="2.5"/>
+                  
+                  <!-- Screen Face -->
+                  <rect x="70" y="54" width="80" height="54" rx="12" fill="url(#screenGrad)" stroke="#1e293b" stroke-width="2"/>
+                  
+                  <!-- Face Expressions Group -->
+                  <g id="botFace" class="face-expression face-waiting">
+                    <!-- Eyes: Animated friendly digital eyes -->
+                    <rect class="bot-eye eye-left" x="84" y="68" width="16" height="20" rx="8" fill="#38bdf8" filter="url(#neonGlow)"/>
+                    <rect class="bot-eye eye-right" x="120" y="68" width="16" height="20" rx="8" fill="#38bdf8" filter="url(#neonGlow)"/>
+                    <!-- Smile / Mouth -->
+                    <path class="bot-mouth" d="M 102 96 Q 110 102 118 96" stroke="#38bdf8" stroke-width="3" stroke-linecap="round" fill="none" filter="url(#neonGlow)"/>
+                  </g>
+
+                  <!-- Neck Connector -->
+                  <rect x="100" y="118" width="20" height="10" rx="4" fill="#334155"/>
+
+                  <!-- Bot Torso / Chassis -->
+                  <rect x="72" y="128" width="76" height="70" rx="16" fill="url(#metalGrad)" stroke="#334155" stroke-width="2"/>
+                  <!-- Core Reactor Glow -->
+                  <circle cx="110" cy="160" r="12" fill="#0284c7" stroke="#38bdf8" stroke-width="2" class="core-reactor"/>
+                  <circle cx="110" cy="160" r="6" fill="#bae6fd" filter="url(#neonGlow)"/>
+
+                  <!-- Left Arm (Resting or Typing) -->
+                  <g class="bot-left-arm" id="botLeftArm">
+                    <path d="M 72 142 Q 50 155 52 180" stroke="#475569" stroke-width="12" stroke-linecap="round" fill="none"/>
+                    <circle cx="52" cy="180" r="7" fill="#60a5fa"/>
+                  </g>
+
+                  <!-- Right Arm: The Reaching Handshake Arm! -->
+                  <g class="bot-reach-arm" id="botReachArm">
+                    <!-- Shoulder -->
+                    <circle cx="148" cy="142" r="8" fill="#334155"/>
+                    <!-- Upper Arm -->
+                    <path d="M 148 142 L 180 150" stroke="#475569" stroke-width="12" stroke-linecap="round"/>
+                    <!-- Elbow Joint -->
+                    <circle cx="180" cy="150" r="7" fill="#60a5fa"/>
+                    <!-- Forearm extending towards human -->
+                    <path d="M 180 150 L 220 152" stroke="#3b82f6" stroke-width="11" stroke-linecap="round"/>
+                    <!-- Robot Hand / Fingers outstretched -->
+                    <g class="bot-hand-fingers" id="botHandFingers">
+                      <!-- Base Palm -->
+                      <circle cx="222" cy="152" r="8" fill="#1d4ed8"/>
+                      <!-- Thumb upward -->
+                      <path d="M 220 148 Q 224 136 230 138" stroke="#60a5fa" stroke-width="5" stroke-linecap="round" fill="none"/>
+                      <!-- Extended Handshake Fingers -->
+                      <path d="M 222 150 Q 235 150 244 150" stroke="#93c5fd" stroke-width="4.5" stroke-linecap="round" fill="none"/>
+                      <path d="M 222 154 Q 236 155 245 156" stroke="#93c5fd" stroke-width="4.5" stroke-linecap="round" fill="none"/>
+                      <path d="M 221 158 Q 234 160 242 162" stroke="#60a5fa" stroke-width="4" stroke-linecap="round" fill="none"/>
+                    </g>
+                  </g>
+
+                  <!-- Floating Jet / Base Propulsor Glow -->
+                  <ellipse cx="110" cy="202" rx="20" ry="5" fill="#38bdf8" filter="url(#neonGlow)" class="jet-glow"/>
+                </svg>
+                <div class="actor-tag bot-tag">
+                  <span class="status-dot"></span>
+                  <span id="botActorLabel">ByteBot (Autonomous Agent)</span>
+                </div>
+              </div>
+
+              <!-- Center Collision / Contact Point Marker -->
+              <div class="handshake-nexus" id="handshakeNexus">
+                <div class="nexus-ring nexus-ring-1"></div>
+                <div class="nexus-ring nexus-ring-2"></div>
+                <div class="nexus-flash" id="nexusFlash"></div>
+              </div>
+
+              <!-- Right Actor: The Human ("YOU") Hand -->
+              <div class="actor actor-human" id="actorHuman">
+                <!-- SVG Human Arm & Hand floating towards bot -->
+                <svg class="human-svg" id="humanSvg" viewBox="0 0 260 260" width="220" height="220" xmlns="http://www.w3.org/2000/svg">
+                  <defs>
+                    <linearGradient id="humanSkinGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                      <stop offset="0%" stop-color="#fdba74"/>
+                      <stop offset="100%" stop-color="#fb923c"/>
+                    </linearGradient>
+                    <linearGradient id="sleeveGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                      <stop offset="0%" stop-color="#1e293b"/>
+                      <stop offset="100%" stop-color="#334155"/>
+                    </linearGradient>
+                  </defs>
+
+                  <g class="human-arm-assembly" id="humanArmAssembly">
+                    <!-- Jacket / Developer Hoodie Sleeve -->
+                    <path d="M 250 125 L 180 142 L 185 175 L 250 185 Z" fill="url(#sleeveGrad)" stroke="#475569" stroke-width="2"/>
+                    <!-- Cuff -->
+                    <rect x="174" y="141" width="10" height="36" rx="4" fill="#0f172a" stroke="#64748b" stroke-width="1.5"/>
+                    <!-- Wrist Watch / Smart wearable band -->
+                    <rect x="168" y="146" width="6" height="26" rx="2" fill="#3b82f6"/>
+
+                    <!-- Wrist -->
+                    <path d="M 174 146 L 152 148 L 152 170 L 174 172 Z" fill="url(#humanSkinGrad)"/>
+
+                    <!-- Human Palm & Outstretched Hand -->
+                    <g class="human-hand-fingers" id="humanHandFingers">
+                      <!-- Palm meat -->
+                      <path d="M 152 148 Q 130 152 124 162 Q 132 172 152 170 Z" fill="url(#humanSkinGrad)"/>
+                      <!-- Thumb outstretched upward & forward -->
+                      <path d="M 148 147 Q 138 132 128 135 Q 124 140 134 148" stroke="#fb923c" stroke-width="6" stroke-linecap="round" fill="url(#humanSkinGrad)"/>
+                      <!-- Fingers extending forward to clasp -->
+                      <path d="M 132 153 Q 106 153 96 153" stroke="#fb923c" stroke-width="5.5" stroke-linecap="round" fill="none"/>
+                      <path d="M 132 159 Q 104 159 94 159" stroke="#f97316" stroke-width="5.5" stroke-linecap="round" fill="none"/>
+                      <path d="M 134 165 Q 108 165 98 165" stroke="#ea580c" stroke-width="5" stroke-linecap="round" fill="none"/>
+                      <path d="M 136 170 Q 115 170 106 170" stroke="#c2410c" stroke-width="4.5" stroke-linecap="round" fill="none"/>
+                    </g>
+                  </g>
+                </svg>
+                <div class="actor-tag human-tag">
+                  <span class="user-chip">YOU</span>
+                  <span>Human Operator</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Handshake Progress Indicator Overlay -->
+            <div class="hold-progress-overlay" id="holdProgressOverlay">
+              <div class="hold-meter-container">
+                <svg class="progress-ring" width="88" height="88">
+                  <circle class="progress-ring-bg" stroke="rgba(255,255,255,0.1)" stroke-width="6" fill="transparent" r="38" cx="44" cy="44"/>
+                  <circle class="progress-ring-fill" id="progressRingFill" stroke="#3b82f6" stroke-width="6" stroke-linecap="round" fill="transparent" r="38" cx="44" cy="44"/>
+                </svg>
+                <div class="hold-meter-label" id="holdMeterLabel">0%</div>
+              </div>
+              <span class="hold-guidance-text" id="holdGuidanceText">Keep holding to seal handshake...</span>
+            </div>
+
+            <!-- Success Overlay Celebration Banner (Shown after handshake completes) -->
+            <div class="success-banner" id="successBanner">
+              <div class="success-badge">
+                <span class="check-icon">✓</span>
+                <span id="successTitle">Claim Awarded!</span>
+              </div>
+              <p class="success-desc" id="successDesc">
+                ByteBot has taken ownership of #412. Transitioning to <b>Deliver</b> stage...
+              </p>
+            </div>
+          </div>
+
+          <!-- Bottom Action Control Bar -->
+          <div class="stage-controls">
+            <!-- Hold-to-Handshake Primary Action Button -->
+            <button class="btn-hold-primary" id="holdActionBtn" aria-label="Hold to award the claim">
+              <span class="btn-fill-bg" id="btnFillBg"></span>
+              <span class="btn-content">
+                <svg class="btn-icon-hand" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M18 11V6a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v0"></path>
+                  <path d="M14 10V4a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v2"></path>
+                  <path d="M10 10.5V6a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v8"></path>
+                  <path d="M18 8a2 2 0 1 1 4 0v6a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.86-5.99-2.34l-3.6-3.6a2 2 0 0 1 2.83-2.82L7 15"></path>
+                </svg>
+                <span class="btn-text-main" id="btnMainText">Hold to award the claim</span>
+                <span class="keyboard-hint">Space / Enter</span>
+              </span>
+            </button>
+
+            <!-- Secondary Reject Action Button -->
+            <button class="btn-secondary-reject" id="rejectActionBtn" title="Decline this claim and return to queue">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="15" y1="9" x2="9" y2="15"></line>
+                <line x1="9" y1="9" x2="15" y2="15"></line>
+              </svg>
+              <span>Not this one</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Terminal-Style Live Event Log -->
+        <div class="card terminal-card">
+          <div class="terminal-header">
+            <div class="terminal-tabs">
+              <div class="terminal-dots">
+                <span class="dot red"></span>
+                <span class="dot yellow"></span>
+                <span class="dot green"></span>
+              </div>
+              <span class="terminal-title">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="4 17 10 11 4 5"></polyline>
+                  <line x1="12" y1="19" x2="20" y2="19"></line>
+                </svg>
+                ziki-event-stream.log
+              </span>
+              <span class="stream-pulse"></span>
+            </div>
+
+            <div class="terminal-actions">
+              <button id="clearLogBtn" class="term-btn" title="Clear console">Clear</button>
+              <button id="copyLogBtn" class="term-btn" title="Copy events as JSON">Copy JSON</button>
+              <button id="simulateNextEventBtn" class="term-btn highlight" title="Simulate next bot event step">
+                <span>Fast-forward Step</span>
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polygon points="5 4 15 12 5 20 5 4"></polygon>
+                  <line x1="19" y1="5" x2="19" y2="19"></line>
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <div class="terminal-body" id="terminalBody" role="log" aria-live="polite">
+            <!-- Event stream entries dynamically rendered here -->
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <!-- Quick Keyboard Shortcuts Modal / Footer Bar -->
+    <footer class="app-footer">
+      <div class="footer-left">
+        <span>Ziki Human-Agent Handshake Protocol • Standalone & Production Ready</span>
+      </div>
+      <div class="footer-shortcuts">
+        <span class="shortcut-item"><kbd>Space</kbd> / <kbd>Enter</kbd> Hold Handshake</span>
+        <span class="shortcut-item"><kbd>Esc</kbd> Not This One</span>
+        <span class="shortcut-item"><kbd>1</kbd>-<kbd>4</kbd> Switch Issue</span>
+        <span class="shortcut-item"><kbd>M</kbd> Mute Audio</span>
+      </div>
+    </footer>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
